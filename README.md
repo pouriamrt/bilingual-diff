@@ -42,7 +42,7 @@ set GEMINI_API_KEY=your-api-key-here
 ### Basic Example
 
 ```bash
-bilingual-merge \
+python run.py \
   --source source.parquet \
   --target target.parquet \
   --en-col en \
@@ -66,7 +66,7 @@ bilingual-merge \
 | `--semantic-threshold` | Keep rows whose best cosine similarity is below this (0-1) | `0.82` |
 | `--embed-backend` | Embedding backend: `minilm` or `gemini` | `minilm` |
 | `--minilm-model` | MiniLM model identifier | `sentence-transformers/all-MiniLM-L6-v2` |
-| `--gemini-model` | Gemini embedding model identifier | `text-embedding-004` |
+| `--gemini-model` | Gemini embedding model identifier | `gemini-embedding-001` |
 | `--gemini-api-key` | Gemini API key (optional if `GEMINI_API_KEY` env var is set) | `None` |
 | `--max-candidates-per-row` | Maximum target rows to scan per candidate (speed cap) | `200` |
 
@@ -82,21 +82,23 @@ Output is always JSONL format.
 
 ## How It Works
 
-1. **Read & Normalize**: Both datasets are loaded and normalized
-2. **Exact Diff**: Rows present in source but not in target are identified
-3. **Fuzzy Filter**: Candidates are filtered using string similarity (RapidFuzz)
-4. **Semantic Filter**: Remaining candidates are filtered using embeddings
-5. **Merge & Dedupe**: Unique rows are appended to target and deduplicated
-6. **Output**: Final merged dataset is written as JSONL
+The tool follows a multi-stage filtering pipeline to ensure only truly unique entries are merged:
 
-The tool provides progress summaries at each stage showing how many rows remain after each filtering step.
+1. **Read & Normalize**: Both datasets are loaded and normalized to ensure consistent column names (`en` and `fr`)
+2. **Exact Diff**: Rows present in source but not in target are identified using an anti-join operation
+3. **Fuzzy Filter**: Candidates are filtered using string similarity (RapidFuzz) - rows with similarity scores above the threshold are removed
+4. **Semantic Filter**: Remaining candidates are filtered using embeddings (MiniLM or Gemini) - rows with cosine similarity above the threshold are removed
+5. **Merge & Dedupe**: Unique rows are appended to target and deduplicated to ensure no duplicates exist
+6. **Output**: Final merged dataset is written as JSONL format
+
+The tool provides progress summaries at each stage showing how many rows remain after each filtering step, helping you understand the filtering effectiveness.
 
 ## Examples
 
 ### Using MiniLM (Local Embeddings)
 
 ```bash
-bilingual-merge \
+python run.py \
   --source data/source.csv \
   --target data/target.csv \
   --out results/merged.jsonl \
@@ -108,7 +110,7 @@ bilingual-merge \
 ### Using Gemini (API-based Embeddings)
 
 ```bash
-bilingual-merge \
+python run.py \
   --source data/source.parquet \
   --target data/target.parquet \
   --out results/merged.jsonl \
@@ -122,3 +124,42 @@ bilingual-merge \
 
 - Python >= 3.13
 - See `pyproject.toml` for full dependency list
+
+### Key Dependencies
+
+- **polars**: Fast DataFrame operations
+- **rapidfuzz**: Fast string similarity matching
+- **sentence-transformers**: For MiniLM embeddings (local)
+- **google-genai**: For Gemini embeddings (API-based)
+- **typer**: CLI framework
+- **rich**: Beautiful terminal output
+
+## Project Structure
+
+```
+df-diff/
+├── bilingual_merge/
+│   ├── cli.py              # Command-line interface
+│   ├── main.py             # Main entry point
+│   ├── config.py           # Configuration dataclass
+│   ├── normalize.py        # Data normalization
+│   ├── diffing.py          # Exact difference detection
+│   ├── fuzzy.py            # Fuzzy matching logic
+│   ├── semantic.py         # Semantic similarity filtering
+│   ├── io_utils.py         # File I/O utilities
+│   ├── output.py           # Output formatting
+│   └── embeddings/         # Embedding backends
+│       ├── base.py         # Base embedder interface
+│       ├── minilm.py       # MiniLM implementation
+│       └── gemini.py       # Gemini implementation
+├── run.py                  # Entry point script
+├── pyproject.toml          # Project configuration
+└── README.md               # This file
+```
+
+## Notes
+
+- The tool uses **cosine similarity** for semantic matching (embeddings are normalized)
+- Fuzzy matching uses **RapidFuzz** with default scoring algorithm
+- Both English and French columns are used for matching to ensure bilingual uniqueness
+- The `--max-candidates-per-row` parameter limits the number of target rows scanned per candidate to improve performance on large datasets
