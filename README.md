@@ -95,6 +95,81 @@ The tool follows a multi-stage filtering pipeline to ensure only truly unique en
 
 The tool provides progress summaries at each stage showing how many rows remain after each filtering step, helping you understand the filtering effectiveness.
 
+## Architecture
+
+The following diagram illustrates the system architecture and data flow:
+
+```mermaid
+graph TB
+%% === STYLES ===
+classDef core fill:#1E90FF,stroke:#000,color:#000,stroke-width:2px,rx:10px,ry:10px;
+classDef module fill:#FFD700,stroke:#000,color:#000,stroke-width:2px,rx:10px,ry:10px;
+classDef external fill:#FF69B4,stroke:#000,color:#000,stroke-width:2px,rx:10px,ry:10px;
+classDef data fill:#9ACD32,stroke:#000,color:#000,stroke-width:2px,rx:10px,ry:10px;
+
+%% === USERS ===
+User(("User<br/>CLI"))
+
+%% === CLI ENTRY POINT ===
+CLIEntry["CLI Entry Point<br/>run.py"]:::core
+
+%% === CLI COMMAND HANDLER ===
+CLICommandHandler["CLI Command Handler<br/>bilingual_merge/cli.py"]:::core
+
+%% === DATA HANDLING ===
+DataHandling["Data Handling<br/>bilingual_merge/io_utils.py"]:::core
+
+%% === DATA NORMALIZATION ===
+DataNormalization["Data Normalization<br/>bilingual_merge/normalize.py"]:::core
+
+%% === DATA DIFFING ===
+DataDiffing["Data Diffing<br/>bilingual_merge/diffing.py"]:::core
+
+%% === OUTPUT MANAGEMENT ===
+OutputManagement["Output Management<br/>bilingual_merge/output.py"]:::core
+
+%% === FILTERING MODULES ===
+FuzzyFiltering["Fuzzy Filtering<br/>bilingual_merge/fuzzy.py"]:::core
+SemanticFiltering["Semantic Filtering<br/>bilingual_merge/semantic.py"]:::core
+
+%% === EMBEDDING MODULES ===
+EmbeddingModules["Embedding Modules<br/>bilingual_merge/embeddings/"]:::core
+MiniLM["MiniLM<br/>SentenceTransformers"]:::external
+Gemini["Gemini<br/>Google GenAI SDK"]:::external
+
+%% === DATA FLOW ===
+User -->|"executes command"| CLIEntry
+CLIEntry -->|"initializes"| CLICommandHandler
+CLICommandHandler -->|"loads datasets"| DataHandling
+DataHandling -->|"reads data into"| DataNormalization
+DataNormalization -->|"normalizes data"| DataDiffing
+DataDiffing -->|"finds exact differences"| OutputManagement
+CLICommandHandler -->|"executes filtering"| FuzzyFiltering
+CLICommandHandler -->|"executes filtering"| SemanticFiltering
+FuzzyFiltering -->|"filters candidates"| OutputManagement
+SemanticFiltering -->|"filters candidates"| OutputManagement
+OutputManagement -->|"writes output"| User
+
+%% === EMBEDDING FLOW ===
+EmbeddingModules -->|"loads models"| MiniLM
+EmbeddingModules -->|"loads models"| Gemini
+FuzzyFiltering -->|"computes similarity"| MiniLM
+SemanticFiltering -->|"computes similarity"| Gemini
+
+%% === DATA STORAGE ===
+subgraph "Data Formats"
+  CSV["CSV Files"]:::data
+  JSON["JSON Files"]:::data
+  JSONL["JSONL Files"]:::data
+  Parquet["Parquet Files"]:::data
+end
+
+DataHandling -->|"detects format"| CSV
+DataHandling -->|"detects format"| JSON
+DataHandling -->|"detects format"| JSONL
+DataHandling -->|"detects format"| Parquet
+```
+
 ## Examples
 
 ### Using MiniLM (Local Embeddings)
