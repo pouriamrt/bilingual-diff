@@ -1,0 +1,9 @@
+source_en,source_fr,target_en,target_fr,fuzzy_score
+Blood pressure was measured twice during the visit.,La pression artérielle a été mesurée deux fois lors de la visite.,Blood pressure was measured two times during the visit.,La pression artérielle a été mesurée deux fois pendant la consultation.,93.75
+The cat sat on the mat.,Le chat était assis sur le tapis.,The cat sat on a mat.,Le chat était assis sur un tapis.,95.0
+The weather is nice today.,Il fait beau aujourd'hui.,The weather is nice today!,Il fait beau aujourd'hui.,96.15384615384616
+The doctor reviewed the patient's medical history.,Le médecin a examiné les antécédents médicaux du patient.,The doctor examined the patient's medical history.,Le médecin a examiné l'historique médical du patient.,92.0
+She forgot to lock the door before leaving.,Elle a oublié de verrouiller la porte avant de partir.,She forgot to close the door before leaving.,Elle a oublié de fermer la porte avant de partir.,94.25287356321839
+Results were stored in a secure database.,Les résultats ont été stockés dans une base de données sécurisée.,Results were saved in a secure database.,Les résultats ont été enregistrés dans une base de données sécurisée.,93.82716049382717
+The application requires user authentication.,L'application nécessite une authentification utilisateur.,The application requires authentication.,L'application nécessite une authentification.,100.0
+She translated the document into French.,Elle a traduit le document en français.,She translated the file into French.,Elle a traduit le fichier en français.,92.53731343283582

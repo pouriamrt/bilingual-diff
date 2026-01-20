@@ -1,0 +1,14 @@
+source_en,source_fr,target_en,target_fr,semantic_score
+She was prescribed antibiotics for the infection.,Elle s'est vu prescrire des antibiotiques pour l'infection.,She received antibiotics to treat the infection.,Elle a reçu des antibiotiques pour traiter l'infection.,0.9558584690093994
+The system crashed after the update.,Le système est tombé en panne après la mise à jour.,The system failed after the software update.,Le système a échoué après la mise à jour du logiciel.,0.8399752378463745
+The experiment produced significant results.,L'expérience a produit des résultats significatifs.,The experiment yielded statistically significant results.,L'expérience a donné des résultats statistiquement significatifs.,0.9065622091293335
+The meeting was postponed until next week.,La réunion a été reportée à la semaine prochaine.,The meeting was postponed.,La réunion a été reportée.,0.8908472061157227
+Data was collected from multiple hospitals.,Les données ont été collectées auprès de plusieurs hôpitaux.,Data was gathered from several hospitals.,Les données ont été recueillies dans plusieurs hôpitaux.,0.95588219165802
+The software update improved performance.,La mise à jour du logiciel a amélioré les performances.,The software update improved overall speed.,La mise à jour du logiciel a amélioré la vitesse globale.,0.93506920337677
+He experienced mild side effects after treatment.,Il a ressenti des effets secondaires légers après le traitement.,He reported mild side effects following treatment.,Il a signalé des effets secondaires légers après le traitement.,0.9392638206481934
+The company announced a new policy.,L'entreprise a annoncé une nouvelle politique.,The company released a new internal policy.,L'entreprise a publié une nouvelle politique interne.,0.8354902863502502
+The child started school this year.,L'enfant a commencé l'école cette année.,The child began school this year.,L'enfant a commencé l'école cette année.,0.9875969290733337
+Temperature readings were recorded hourly.,Les relevés de température ont été enregistrés toutes les heures.,Temperature measurements were taken every hour.,Les mesures de température ont été prises toutes les heures.,0.8648585081100464
+Participants provided written consent.,Les participants ont fourni un consentement écrit.,Participants signed an informed consent form.,Les participants ont signé un formulaire de consentement éclairé.,0.842383861541748
+The server handled thousands of requests per minute.,Le serveur a traité des milliers de requêtes par minute.,The server processed many requests per minute.,Le serveur a traité de nombreuses requêtes par minute.,0.9319784045219421
+He bought groceries on his way home.,Il a acheté des courses sur le chemin du retour.,He purchased groceries while returning home.,Il a acheté des provisions en rentrant chez lui.,0.9234050512313843
