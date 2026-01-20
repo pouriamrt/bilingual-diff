@@ -52,7 +52,7 @@ def main(
         "sentence-transformers/all-MiniLM-L6-v2", help="MiniLM model id."
     ),
     gemini_model: str = typer.Option(
-        "text-embedding-004", help="Gemini embedding model id."
+        "gemini-embedding-001", help="Gemini embedding model id."
     ),
     gemini_api_key: Optional[str] = typer.Option(
         None, help="Gemini API key (or set GEMINI_API_KEY)."

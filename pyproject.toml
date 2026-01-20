@@ -1,7 +1,7 @@
 [project]
 name = "df-diff"
 version = "0.1.0"
-description = "Add your description here"
+description = "CLI tool for merging bilingual datasets with deduplication, fuzzy, and semantic filtering"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
