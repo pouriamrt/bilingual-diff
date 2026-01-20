@@ -26,3 +26,9 @@ def write_jsonl(df: pl.DataFrame, out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     logger.info(f"Writing JSONL to {out_path}")
     df.write_ndjson(out_path)
+
+
+def write_csv(df: pl.DataFrame, out_path: Path) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Writing CSV to {out_path}")
+    df.write_csv(out_path)

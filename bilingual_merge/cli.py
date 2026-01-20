@@ -12,7 +12,7 @@ from bilingual_merge.normalize import prepare
 from bilingual_merge.diffing import find_exact_differences
 from bilingual_merge.fuzzy import fuzzy_mismatch_filter
 from bilingual_merge.semantic import semantic_mismatch_filter
-from bilingual_merge.output import append_and_dedupe_target, write_jsonl
+from bilingual_merge.output import append_and_dedupe_target, write_jsonl, write_csv
 from bilingual_merge.embeddings import MiniLMEmbedder, GeminiEmbedder, Embedder
 
 console = Console()
@@ -161,4 +161,5 @@ def main(
     )
 
     write_jsonl(final_df, cfg.out)
+    write_csv(final_df, cfg.out.with_suffix(".csv"))
     console.print(f"[green]Done.[/green] Output: {cfg.out}")
