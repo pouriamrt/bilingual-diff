@@ -16,8 +16,10 @@ The final output is a deduplicated JSONL file containing the merged dataset.
 
 ### Base Installation
 
+Install dependencies using `uv`:
+
 ```bash
-pip install -e .
+uv sync
 ```
 
 Then set your API key:
@@ -161,5 +163,5 @@ df-diff/
 
 - The tool uses **cosine similarity** for semantic matching (embeddings are normalized)
 - Fuzzy matching uses **RapidFuzz** with default scoring algorithm
-- Both English and French columns are used for matching to ensure bilingual uniqueness
+- **Only the English column is used for similarity matching** (both fuzzy and semantic). The French column is preserved in the output but not used for comparison.
 - The `--max-candidates-per-row` parameter limits the number of target rows scanned per candidate to improve performance on large datasets
