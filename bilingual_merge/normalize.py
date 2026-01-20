@@ -32,11 +32,12 @@ def prepare(df: pl.DataFrame, en_col: str, fr_col: str) -> pl.DataFrame:
         )
         .with_columns(
             [
-                pl.map_elements(
-                    ["en_norm", "fr_norm"],
-                    lambda x: stable_row_key(x[0], x[1]),
+                pl.struct(["en_norm", "fr_norm"])
+                .map_elements(
+                    lambda s: stable_row_key(s["en_norm"], s["fr_norm"]),
                     return_dtype=pl.Utf8,
-                ).alias("row_key")
+                )
+                .alias("row_key")
             ]
         )
     )
