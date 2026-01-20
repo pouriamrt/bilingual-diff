@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Literal, Optional, Dict
 
+import polars as pl
 import typer
 from loguru import logger
 from rich.console import Console
@@ -12,7 +13,12 @@ from bilingual_merge.normalize import prepare
 from bilingual_merge.diffing import find_exact_differences
 from bilingual_merge.fuzzy import fuzzy_mismatch_filter
 from bilingual_merge.semantic import semantic_mismatch_filter
-from bilingual_merge.output import append_and_dedupe_target, write_jsonl, write_csv
+from bilingual_merge.output import (
+    append_and_dedupe_target,
+    write_jsonl,
+    write_csv,
+    write_similar_items,
+)
 from bilingual_merge.embeddings import MiniLMEmbedder, GeminiEmbedder, Embedder
 
 console = Console()
@@ -104,7 +110,7 @@ def main(
         raise typer.Exit(code=0)
 
     # Fuzzy mismatch filter
-    fuzzy_kept = fuzzy_mismatch_filter(
+    fuzzy_kept, fuzzy_similar = fuzzy_mismatch_filter(
         candidates=candidates,
         tgt=tgt,
         threshold=cfg.fuzzy_threshold,
@@ -113,7 +119,11 @@ def main(
     )
     render_summary(
         "After fuzzy filter",
-        {"candidates_in": candidates.height, "fuzzy_mismatches": fuzzy_kept.height},
+        {
+            "candidates_in": candidates.height,
+            "fuzzy_mismatches": fuzzy_kept.height,
+            "fuzzy_similar": fuzzy_similar.height,
+        },
     )
 
     if fuzzy_kept.is_empty():
@@ -121,6 +131,7 @@ def main(
             "[yellow]All candidates had strong fuzzy matches. Writing target as JSONL.[/yellow]"
         )
         write_jsonl(tgt.select(["en", "fr"]), cfg.out)
+        write_similar_items(fuzzy_similar, pl.DataFrame(), tgt, cfg.out)
         console.print(f"[cyan]Output:[/cyan] {cfg.out}")
         raise typer.Exit(code=0)
 
@@ -131,7 +142,7 @@ def main(
         embedder = GeminiEmbedder(model=cfg.gemini_model, api_key=cfg.gemini_api_key)
 
     # Semantic mismatch filter
-    semantic_kept = semantic_mismatch_filter(
+    semantic_kept, semantic_similar = semantic_mismatch_filter(
         candidates=fuzzy_kept,
         tgt=tgt,
         embedder=embedder,
@@ -144,6 +155,7 @@ def main(
         {
             "fuzzy_mismatches_in": fuzzy_kept.height,
             "semantic_mismatches": semantic_kept.height,
+            "semantic_similar": semantic_similar.height,
         },
     )
 
@@ -162,4 +174,5 @@ def main(
 
     write_jsonl(final_df, cfg.out)
     write_csv(final_df, cfg.out.with_suffix(".csv"))
+    write_similar_items(fuzzy_similar, semantic_similar, tgt, cfg.out)
     console.print(f"[green]Done.[/green] Output: {cfg.out}")

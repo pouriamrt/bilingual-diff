@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import polars as pl
 from rapidfuzz import fuzz
@@ -19,16 +19,17 @@ def fuzzy_mismatch_filter(
     *,
     max_candidates_per_row: int,
     console: Console,
-) -> pl.DataFrame:
+) -> Tuple[pl.DataFrame, pl.DataFrame]:
     """
     For each candidate row, compute best fuzzy match score against target EN strings.
     Keep rows whose best score < threshold.
+    Returns (kept, similar) where similar are rows filtered out (score >= threshold).
 
     max_candidates_per_row is a speed cap on number of target rows scanned per candidate.
     """
     tgt_en_all = tgt["en"].to_list()
     if not tgt_en_all:
-        return candidates
+        return candidates, pl.DataFrame()
 
     tgt_en = (
         tgt_en_all[:max_candidates_per_row]
@@ -38,6 +39,7 @@ def fuzzy_mismatch_filter(
     cand_en = candidates["en"].to_list()
 
     scores: List[int] = []
+    best_match_indices: List[int] = []
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -50,14 +52,24 @@ def fuzzy_mismatch_filter(
         )
         for s in cand_en:
             best = 0
-            for t in tgt_en:
+            best_idx = -1
+            for idx, t in enumerate(tgt_en):
                 sc = fuzz.token_set_ratio(s, t)
                 if sc > best:
                     best = sc
+                    best_idx = idx
                     if best == 100:
                         break
             scores.append(best)
+            best_match_indices.append(best_idx)
             progress.advance(task)
 
-    out = candidates.with_columns(pl.Series("fuzzy_best_en", scores))
-    return out.filter(pl.col("fuzzy_best_en") < threshold)
+    out = candidates.with_columns(
+        [
+            pl.Series("fuzzy_best_en", scores),
+            pl.Series("fuzzy_best_match_idx", best_match_indices),
+        ]
+    )
+    kept = out.filter(pl.col("fuzzy_best_en") < threshold)
+    similar = out.filter(pl.col("fuzzy_best_en") >= threshold)
+    return kept, similar
