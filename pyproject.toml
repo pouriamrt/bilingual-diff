@@ -1,0 +1,17 @@
+[project]
+name = "df-diff"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-genai>=1.59.0",
+    "loguru>=0.7.3",
+    "numpy>=2.4.1",
+    "polars>=1.37.1",
+    "pre-commit>=4.5.1",
+    "rapidfuzz>=3.14.3",
+    "rich>=14.2.0",
+    "sentence-transformers>=5.2.0",
+    "typer>=0.21.1",
+]
